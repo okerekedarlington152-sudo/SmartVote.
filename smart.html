@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartVote - Online Voting</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #10152f, #263d70);
+  color: white;
+}
+
+.container {
+  max-width: 600px;
+  margin: 30px auto;
+  background: #ffffff;
+  color: #17213c;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 35px #0005;
+}
+
+h1 {
+  text-align: center;
+  color: #315ce8;
+}
+
+.subtitle {
+  text-align: center;
+  color: #667085;
+}
+
+.candidate {
+  background: #f1f4ff;
+  padding: 18px;
+  border-radius: 12px;
+  margin: 15px 0;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 9px;
+  background: #315ce8;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #193fbd;
+}
+
+.result {
+  height: 12px;
+  background: #dce3f5;
+  border-radius: 20px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.bar {
+  height: 100%;
+  background: #315ce8;
+  width: 0%;
+}
+
+#message {
+  text-align: center;
+  font-weight: bold;
+  color: green;
+  margin-top: 15px;
+}
+
+footer {
+  text-align: center;
+  color: #777;
+  margin-top: 25px;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🗳️ SmartVote</h1>
+
+<p class="subtitle">
+Your Voice Matters! Choose Your Favourite Candidate.
+</p>
+
+<h3>Presidential Election Demo</h3>
+
+<div id="candidates"></div>
+
+<h3>📊 Live Voting Results</h3>
+
+<div id="results"></div>
+
+<p id="message"></p>
+
+<button onclick="resetVotes()" style="background:#e34b4b;">
+Reset Demo Votes
+</button>
+
+<footer>
+Built with ❤️ by SmartVote | #MyFirstCode
+</footer>
+
+</div>
+
+<script>
+
+const candidates = ["Alex Johnson", "Sarah Williams", "David Brown"];
+
+let votes = JSON.parse(localStorage.getItem("smartVotes")) || [0,0,0];
+
+function saveVotes() {
+  localStorage.setItem("smartVotes", JSON.stringify(votes));
+}
+
+function vote(index) {
+  if (localStorage.getItem("hasVoted")) {
+    document.getElementById("message").textContent =
+      "You have already voted on this device!";
+    return;
+  }
+
+  votes[index]++;
+  saveVotes();
+
+  localStorage.setItem("hasVoted", "yes");
+
+  document.getElementById("message").textContent =
+    "Thank you! Your vote has been recorded.";
+
+  displayResults();
+}
+
+function displayResults() {
+  const total = votes.reduce((a,b) => a+b, 0);
+
+  document.getElementById("candidates").innerHTML =
+    candidates.map((name, index) => `
+      <div class="candidate">
+        <h3>${name}</h3>
+        <button onclick="vote(${index})">Vote for ${name}</button>
+      </div>
+    `).join("");
+
+  document.getElementById("results").innerHTML =
+    candidates.map((name, index) => {
+      const percentage = total
+        ? (votes[index] / total * 100).toFixed(1)
+        : 0;
+
+      return `
+        <div>
+          <p><b>${name}</b> — ${votes[index]} votes (${percentage}%)</p>
+          <div class="result">
+            <div class="bar" style="width:${percentage}%"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+  document.getElementById("results").innerHTML +=
+    `<h4>Total votes: ${total}</h4>`;
+}
+
+function resetVotes() {
+  if (!confirm("Reset all demo votes?")) return;
+
+  votes = [0,0,0];
+  localStorage.removeItem("smartVotes");
+  localStorage.removeItem("hasVoted");
+
+  document.getElementById("message").textContent =
+    "Demo votes have been reset.";
+
+  displayResults();
+}
+
+displayResults();
+
+</script>
+
+</body>
+  </html>
